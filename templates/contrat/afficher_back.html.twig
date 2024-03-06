@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="content-body">
+        <div class="container-fluid mt-3">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="active-member">
+                                <input type="text" id="search" placeholder="Search...">
+                                <div class="table-responsive">
+                                    <table class="table table-xs mb-0" id="tableac">
+                                        <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Duree</th>
+                                            <th>Date De Souscription</th>
+                                            <th>Type Couverture</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for author in authors %}
+                                            <tr class="searchable">
+                                                <td>{{ author.getId() }}</td>
+                                                <td>{{ author.getDuree() }}</td>
+                                                <td>{{ author.getDateDeSouscription() | date('Y-m-d') }}</td>
+                                                <td>{{ author.getTypeCouverture() }}</td>
+                                                <td>
+                                                    <a href="{{ path('app_contrat_delete', {'id': author.getId()}) }}"><i class="fa">&#xf014;</i></a>
+                                                    <a href="{{ path('app_contrat_edit', {'id': author.getId()}) }}"><i class="fa fa-pencil"></i></a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <a href="{{ path('app_contrat_fnew') }}">Ajouter contrat</a>
+                                </div>
+                            </div>
+                            <!-- Pagination Container -->
+                            <div class="row">
+                                <div class="col-md-12 text-center" id="pagination-container">
+                                    <!-- Pagination links will be dynamically added here -->
+                                </div>
+                            </div> <!-- End Pagination -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            $('#search').keyup(function(){
+                searchItems($(this).val());
+            });
+        });
+
+        function searchItems(value){
+            $('.searchable').each(function(){
+                var found = false;
+                $(this).find('td:nth-child(4)').each(function(){ // Target the fourth column (Type Couverture)
+                    if($(this).text().toLowerCase().includes(value.toLowerCase())){
+                        found = true;
+                        return false;
+                    }
+                });
+                if(found || value === ''){
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const itemsPerPage = 5; // Change this value as needed
+            const rows = $('.searchable');
+            const numPages = Math.ceil(rows.length / itemsPerPage);
+
+            function paginate(page) {
+                rows.hide().slice((page - 1) * itemsPerPage, page * itemsPerPage).show();
+            }
+
+            function createPaginationLinks() {
+                const paginationContainer = $('#pagination-container');
+                for (let i = 1; i <= numPages; i++) {
+                    const link = $('<a href="#">').text(i);
+                    link.click(function(event) {
+                        event.preventDefault();
+                        paginate(i);
+                    });
+                    paginationContainer.append(link, ' ');
+                }
+            }
+
+            createPaginationLinks();
+            paginate(1); // Show the first page initially
+        });
+    </script>
+
+{% endblock %}

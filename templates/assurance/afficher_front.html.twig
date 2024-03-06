@@ -1,0 +1,204 @@
+{% extends 'basefront.html.twig' %}
+
+{% block css %}
+    {{ parent() }}
+    <style>
+        .rounded-button {
+            border-radius: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .rounded-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Styles pour les assurances */
+        .insurance-item {
+            display: inline-block;
+            margin-right: 20px; /* Ajustez la marge selon vos préférences */
+            margin-bottom: 20px; /* Ajoute un espace en bas */
+        }
+
+    </style>
+{% endblock %}
+
+{% block body %}
+    <section id="services" class="services section-bg">
+        <div class="container" data-aos="fade-up">
+            <div class="section-title">
+
+                <h2> Nos assurances </h2>
+                <br>
+
+                <p>Protégez votre avenir avec Nova</p>
+                <br>
+                <input type="text" id="search" placeholder="Rechercher par nom..." class="form-control">
+            </div>
+            <div class="row" id="partner-list">
+                {% for author in authors %}
+                    <div class="insurance-item">
+                        <div class="icon-box">
+                            <div class="icon"><i class="bx bx-file"></i></div>
+                            <h4><a href="">{{ author.getNom() }}</a></h4>
+                            <p>{{ author.getType() }}</p>
+                            <div class="text-center">
+                                <a class="rounded-button" href="{{ path('app_contrat_fnew1') }}">submit contrat</a>
+                                <br>
+                                <br>
+                                <br>
+                                <div class="text-center">
+                                    {# Bouton pour ajouter ou supprimer des favoris #}
+                                    {% if author.isFavoris %}
+                                        <a class="rounded-button favorite-button" href="{{ path('app_assurance_remove_favorite', {id: author.getId()}) }}">Retirer des favoris</a>
+                                    {% else %}
+                                        <a class="rounded-button favorite-button" href="{{ path('app_assurance_marquer_favorite', {id: author.getId()}) }}">Ajouter aux favoris</a>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <!-- Pagination Container -->
+                <div class="row">
+                    <div class="col-md-12 text-center" id="pagination-container">
+                        <!-- Pagination links will be dynamically added here -->
+
+                    </div>
+                    {# Ajouter un bouton pour aller à la page des favoris #}<br>
+                    <div class="text-center">
+                        <br>
+                        <br>
+                        <a class="rounded-button" href="{{ path('app_assurances_favorites') }}">Voir mes assurances favorites</a>
+                    </div>
+
+                </div> <!-- End Pagination -->
+            </div>
+        </div>
+    </section><!-- End Services Section -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#search').keyup(function(){
+                searchItems($(this).val());
+            });
+        });
+
+        function searchItems(value){
+            $('.insurance-item').each(function(){
+                var found = false;
+                $(this).find('h4').each(function(){
+                    if($(this).text().toLowerCase().includes(value.toLowerCase())){
+                        found = true;
+                        return false;
+                    }
+                });
+                if(found || value === ''){
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const itemsPerPage = 2; // Change this value as needed
+            const offres = document.querySelectorAll('.insurance-item');
+            const numPages = Math.ceil(offres.length / itemsPerPage);
+
+            function paginate(page) {
+                offres.forEach((offre, index) => {
+                    const start = (page - 1) * itemsPerPage;
+                    const end = start + itemsPerPage;
+                    if (index >= start && index < end) {
+                        offre.style.display = 'inline-block';
+                    } else {
+                        offre.style.display = 'none';
+                    }
+                });
+            }
+
+            function createPaginationLinks() {
+                const paginationContainer = document.getElementById('pagination-container');
+                for (let i = 1; i <= numPages; i++) {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.textContent = i;
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        paginate(i);
+                    });
+                    paginationContainer.appendChild(link);
+                    paginationContainer.appendChild(document.createTextNode(' '));
+                }
+            }
+
+            createPaginationLinks();
+            paginate(1); // Show the first page initially
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Marquer une assurance comme favori
+            $('.favorite-button').click(function(e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.success) {
+                            // Mettre à jour l'apparence du bouton pour indiquer qu'il est maintenant favori
+                            $(e.target).addClass('favorited');
+                            location.reload();
+                        } else {
+                            // Afficher un message d'erreur ou gérer l'erreur autrement
+                            console.error(data.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Afficher un message d'erreur en cas d'échec de la requête AJAX
+                        console.error(error);
+                    }
+                });
+            });
+
+            // Retirer une assurance des favoris
+            $('.remove-favorite-button').click(function(e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.success) {
+                            // Mettre à jour l'apparence du bouton pour indiquer qu'il n'est plus favori
+                            $(e.target).removeClass('favorited');
+                            location.reload();
+                        } else {
+                            // Afficher un message d'erreur ou gérer l'erreur autrement
+                            console.error(data.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Afficher un message d'erreur en cas d'échec de la requête AJAX
+                        console.error(error);
+                    }
+                });
+            });
+        });
+
+    </script>
+
+{% endblock %}

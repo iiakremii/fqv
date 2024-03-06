@@ -1,0 +1,87 @@
+{% extends 'basefront.html.twig' %}
+
+{% block body %}
+    {% if added %}
+        <div id="successMessage" class="alert alert-success custom-success-message" role="alert">
+            Contrat ajouté avec succès!
+        </div>
+    {% endif %}
+
+    <div class="content-body">
+        <div class="container-fluid mt-3">
+            <div class="row">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="active-member">
+                                    <div class="table-responsive">
+                                        <table class="table table-xs mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>duree</th>
+                                                <th>DateDeSouscription</th>
+                                                <th>TypeCouverture</th>
+                                            </tr>
+                                            </thead>
+                                            {% for author in authors %}
+                                                <tbody>
+                                                <tr>
+                                                    <td>{{ author.getId() }}</td>
+                                                    <td>{{ author.getDuree() }}</td>
+                                                    <td>
+                                                        <span>{{ author.getDateDeSouscription() | date('Y-m-d ')}}</span>
+                                                    </td>
+                                                    <td>
+                                                        {{ author.getTypeCouverture() }}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ path('app_contrat_delete1', {'id': author.getId()}) }}" ><i class="fa">&#xf014;</i>delete</a>
+                                                        <a href="{{ path('app_contrat_edit1', {'id': author.getId()}) }}"><i class="fa fa-pencil"></i> modifier</a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            {% endfor %}
+                                        </table>
+                                        <a href="{{ path('app_contrat_fnew1') }}"> ajouter contrat </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Add a div for the pop-up message */
+        .custom-success-message {
+            /* Add your custom styles here */
+            background-color: #d4edda;
+            border-color: #01280a;
+            color: #14bacb;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid transparent;
+            border-radius: .25rem;
+        }
+    </style>
+
+    <script>
+        // JavaScript code to display the pop-up message
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the success message element
+            const successMessage = document.getElementById('successMessage');
+
+            // Show the success message
+            successMessage.style.display = 'block';
+
+            // Hide the success message after 3 seconds
+            setTimeout(function() {
+                successMessage.style.display = 'none';
+            }, 3000);
+        });
+    </script>
+{% endblock %}

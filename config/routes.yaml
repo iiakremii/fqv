@@ -1,3 +1,8 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+# config/routes/annotations.yaml
+controllers:
+  resource: ../src/Controller/
+  type: annotation
+# config/routes.yaml
+app_assurances_favorites:
+  path: '/assurances/favorites'
+  controller: 'App\Controller\AssuranceController::favoriteAssurances'

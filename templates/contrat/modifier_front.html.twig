@@ -1,0 +1,46 @@
+{% extends 'basefront.html.twig' %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-validation">
+                            <form class="form-valide" action="#" method="post">
+                                <h1 class="text-white text-center">Modifier assurance</h1>
+                                {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'text-white text-danger'}}) }}
+                                <div class="form-group">
+                                    {{ form_label(form.duree, 'duree') }}
+                                    {{ form_errors(form.duree, {'attr': {'class': 'text-danger'}}) }}
+                                    {{ form_widget(form.duree, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(form.date_de_souscription, 'date_de_souscription') }}
+                                    {{ form_errors(form.date_de_souscription, {'attr': {'class': 'text-danger'}}) }}
+                                    {{ form_widget(form.date_de_souscription, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(form.type_couverture, 'type_couverture') }}
+                                    {{ form_errors(form.type_couverture, {'attr': {'class': 'text-danger'}}) }}
+                                    {{ form_widget(form.type_couverture, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary">modifier</button>
+                                </div>
+                                {{ form_end(form) }}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+{% endblock %}

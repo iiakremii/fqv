@@ -1,0 +1,183 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Assurances favorites{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <style>
+        .assurance-box {
+            background-color: #f8f9fa; /* Adjust background color as per your preference */
+            border: 1px solid #dee2e6; /* Adjust border color as per your preference */
+            border-radius: 10px; /* Adjust border radius as per your preference */
+            padding: 20px; /* Adjust padding as per your preference */
+            margin-bottom: 20px; /* Adjust margin bottom as per your preference */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow for depth */
+        }
+
+        .assurance-box h3 {
+            margin-top: 0; /* Remove default margin */
+        }
+
+        .rounded-button {
+            border-radius: 20px; /* Adjust the value as per your preference */
+            padding: 10px 20px; /* Adjust padding as per your preference */
+            background-color: #007bff; /* Change background color as per your preference */
+            color: #fff; /* Change text color as per your preference */
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: inline-block; /* Ensure button behaves like inline element */
+            text-decoration: none; /* Remove underline from link */
+            margin-top: 10px; /* Adjust margin-top as per your preference */
+        }
+
+        .rounded-button:hover {
+            background-color: #0056b3; /* Change background color on hover */
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <h1>Assurances favorites</h1>
+
+    {% for assurance in favoriteAssurances %}
+        <div class="assurance-box">
+            <h3>{{ assurance.nom }}</h3>
+            <br>
+            <br>
+
+            <div class="text-center">
+                {# Bouton pour ajouter ou supprimer des favoris #}
+                {% if assurance.isFavoris %}
+                    <a class="rounded-button favorite-button" href="{{ path('app_assurance_remove_favorite', {id: assurance.getId()}) }}">Retirer des favoris</a>
+
+                {% endif %}
+            </div>
+            <!-- Display other information about the assurance if needed -->
+            <a class="rounded-button" href="{{ path('app_contrat_fnew1') }}">Submit contrat</a>
+        </div>
+    {% endfor %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#search').keyup(function(){
+                searchItems($(this).val());
+            });
+        });
+
+        function searchItems(value){
+            $('.insurance-item').each(function(){
+                var found = false;
+                $(this).find('h4').each(function(){
+                    if($(this).text().toLowerCase().includes(value.toLowerCase())){
+                        found = true;
+                        return false;
+                    }
+                });
+                if(found || value === ''){
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const itemsPerPage = 2; // Change this value as needed
+            const offres = document.querySelectorAll('.insurance-item');
+            const numPages = Math.ceil(offres.length / itemsPerPage);
+
+            function paginate(page) {
+                offres.forEach((offre, index) => {
+                    const start = (page - 1) * itemsPerPage;
+                    const end = start + itemsPerPage;
+                    if (index >= start && index < end) {
+                        offre.style.display = 'inline-block';
+                    } else {
+                        offre.style.display = 'none';
+                    }
+                });
+
+            }
+
+            function createPaginationLinks() {
+                const paginationContainer = document.getElementById('pagination-container');
+                for (let i = 1; i <= numPages; i++) {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.textContent = i;
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        paginate(i);
+                    });
+                    paginationContainer.appendChild(link);
+                    paginationContainer.appendChild(document.createTextNode(' '));
+                }
+            }
+
+            createPaginationLinks();
+            paginate(1); // Show the first page initially
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Marquer une assurance comme favori
+            $('.favorite-button').click(function(e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.success) {
+                            // Mettre à jour l'apparence du bouton pour indiquer qu'il est maintenant favori
+                            $(e.target).addClass('favorited');
+                            location.reload();
+                        } else {
+                            // Afficher un message d'erreur ou gérer l'erreur autrement
+                            console.error(data.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Afficher un message d'erreur en cas d'échec de la requête AJAX
+                        console.error(error);
+                    }
+                });
+            });
+
+            // Retirer une assurance des favoris
+            $('.remove-favorite-button').click(function(e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.success) {
+                            // Mettre à jour l'apparence du bouton pour indiquer qu'il n'est plus favori
+                            $(e.target).removeClass('favorited');
+                            location.reload();
+                        } else {
+                            // Afficher un message d'erreur ou gérer l'erreur autrement
+                            console.error(data.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Afficher un message d'erreur en cas d'échec de la requête AJAX
+                        console.error(error);
+                    }
+                });
+            });
+        });
+
+    </script>
+
+
+
+{% endblock %}
